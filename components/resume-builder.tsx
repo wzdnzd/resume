@@ -42,11 +42,10 @@ const ViewModeSelector = memo(
             className={`
             relative px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200
             flex items-center gap-2 min-w-[100px] justify-center
-            ${
-              viewMode === mode.key
+            ${viewMode === mode.key
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
-            }
+              }
           `}
           >
             <Icon icon={mode.icon} className="w-4 h-4" />
@@ -229,16 +228,6 @@ export default function ResumeBuilder() {
         <div className="flex items-center gap-2">
           <ViewModeSelector viewMode={viewMode} onViewModeChange={handleViewModeChange} />
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSave}
-            className="gap-2 bg-transparent"
-          >
-            <Icon icon="mdi:content-save" className="w-4 h-4" />
-            保存
-          </Button>
-
           <Separator orientation="vertical" className="h-6" />
 
           <input type="file" accept=".magicyan" onChange={handleImport} className="hidden" id="import-file" />
@@ -257,9 +246,9 @@ export default function ResumeBuilder() {
             保存
           </Button>
 
-          <PDFExportButton 
-            resumeData={editorState.resumeData} 
-            size="sm" 
+          <PDFExportButton
+            resumeData={editorState.resumeData}
+            size="sm"
           />
         </div>
       </div>

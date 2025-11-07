@@ -22,7 +22,7 @@ export function createNewModule(order: number): ResumeModule {
 export function createNewPersonalInfoItem(): PersonalInfoItem {
   return {
     id: `info-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    label: "新标签",
+    label: "新标签，如：电话、邮箱等",
     value: {
       content: "",
       type: "text",

@@ -254,12 +254,12 @@ function PersonalInfoItemEditor({
           <Button
             variant="outline"
             size="sm"
-            className="icon-button-personal-info bg-transparent w-10 h-12 p-0 flex items-center justify-center"
+            className="icon-button-personal-info bg-transparent w-8 h-8 p-0 flex items-center justify-center"
           >
             {item.icon && (
               <svg
-                width={20}
-                height={20}
+                width={16}
+                height={16}
                 viewBox="0 0 24 24"
                 className="text-muted-foreground"
                 dangerouslySetInnerHTML={{ __html: item.icon }}
@@ -279,78 +279,77 @@ function PersonalInfoItemEditor({
       </Dialog>
 
       {/* 单行布局：标签 | 类型 | 值输入 | 删除 */}
-      <div className="flex-1 grid grid-cols-12 gap-8">
-        {/* 标签 - 占用2列 */}
-        <div className="col-span-2">
-          <Label className="text-xs text-muted-foreground">标签</Label>
-          <Input
-            value={item.label}
-            onChange={(e) => onUpdate({ label: e.target.value })}
-            placeholder="如：电话、邮箱"
-            className="h-8"
-          />
+      <div className="flex-1 flex items-end gap-4">
+        {/* 标签 */}
+        <div className="w-36 flex-shrink-0">
+          <div className="h-8 flex flex-col justify-end">
+            <Input
+              value={item.label}
+              onChange={(e) => onUpdate({ label: e.target.value })}
+              placeholder="标签"
+              className="h-8 placeholder:text-gray-400"
+            />
+          </div>
         </div>
 
-        {/* 类型选择 - 占用2列 */}
-        <div className="col-span-2">
-          <Label className="text-xs text-muted-foreground">类型</Label>
-          <Select
-            value={item.value.type || "text"}
-            onValueChange={(value: "text" | "link") => onUpdate({ value: { ...item.value, type: value } })}
-          >
-            <SelectTrigger className="h-8">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="text">文本</SelectItem>
-              <SelectItem value="link">链接</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* 类型选择 */}
+        <div className="w-20 flex-shrink-0">
+          <div className="h-8 flex flex-col justify-end">
+            <Select
+              value={item.value.type || "text"}
+              onValueChange={(value: "text" | "link") => onUpdate({ value: { ...item.value, type: value } })}
+            >
+              <SelectTrigger className="h-8 py-0 px-3 text-sm border-gray-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="text">文本</SelectItem>
+                <SelectItem value="link">链接</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {/* 值输入 - 占用6列，根据类型显示不同的内容 */}
-        <div className="col-span-6">
+        {/* 值输入 */}
+        <div className="flex-1">
           {item.value.type === "link" ? (
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <Label className="text-xs text-muted-foreground mb-1 block">链接地址</Label>
+            <div className="flex gap-6 h-8">
+              <div className="flex-2 h-8 flex flex-col justify-end">
                 <Input
                   value={item.value.content}
                   onChange={(e) => onUpdate({ value: { ...item.value, content: e.target.value } })}
-                  placeholder="https://..."
-                  className="h-8 w-full"
+                  placeholder="链接地址"
+                  className="h-8 w-full placeholder:text-gray-400"
                 />
               </div>
-              <div className="flex-1">
-                <Label className="text-xs text-muted-foreground mb-1 block">显示标题</Label>
+              <div className="flex-1 h-8 flex flex-col justify-end">
                 <Input
                   value={item.value.title || ""}
                   onChange={(e) => onUpdate({ value: { ...item.value, title: e.target.value } })}
-                  placeholder="如：clickme"
-                  className="h-8 w-full"
+                  placeholder="显示标题"
+                  className="h-8 w-full placeholder:text-gray-400"
                 />
               </div>
             </div>
           ) : (
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1 block">内容</Label>
+            <div className="h-8 flex flex-col justify-end">
               <Input
                 value={item.value.content}
                 onChange={(e) => onUpdate({ value: { ...item.value, content: e.target.value } })}
-                placeholder="请输入对应内容"
-                className="h-8 w-full"
+                placeholder="内容"
+                className="h-8 w-full placeholder:text-gray-400"
               />
             </div>
           )}
         </div>
 
-        {/* 删除按钮 - 占用1列 */}
-        <div className="col-span-1 flex justify-center">
+        {/* 删除按钮 */}
+        <div className="flex-shrink-0">
           <Button
             variant="ghost"
             size="sm"
             onClick={onRemove}
-            className="icon-button text-destructive hover:text-destructive"
+            className="icon-button text-destructive hover:text-destructive h-8 w-8 p-0"
           >
             <Icon icon="mdi:delete" className="w-4 h-4" />
           </Button>
