@@ -280,7 +280,11 @@ export default function ResumeBuilder() {
               <PersonalInfoEditor
                 personalInfoSection={editorState.resumeData.personalInfoSection}
                 avatar={editorState.resumeData.avatar}
-                onUpdate={(personalInfoSection, avatar) => updateResumeData({ personalInfoSection, avatar })}
+                onUpdate={(personalInfoSection, avatar) => {
+                  const updates: Partial<ResumeData> = { personalInfoSection }
+                  if (avatar !== undefined) updates.avatar = avatar
+                  updateResumeData(updates)
+                }}
               />
 
               {/* 简历模块编辑 */}

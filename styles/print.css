@@ -106,10 +106,8 @@
   }
   /* 不强制截断，保持与预览一致 */
 
-  /* 头像在打印时的处理 */
+  /* 头像在打印时的处理：不强制尺寸，允许在非居中模式下随父容器高度伸展 */
   .resume-avatar {
-    width: 50pt !important;
-    height: 50pt !important;
     border-radius: 50% !important;
     border: 1pt solid #ccc !important;
     object-fit: cover !important;

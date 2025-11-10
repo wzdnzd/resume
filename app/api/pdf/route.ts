@@ -15,6 +15,22 @@ function getOrigin(req: Request) {
   return `${proto}://${host}`;
 }
 
+async function toDataUrlIfRemote(url?: string): Promise<string | undefined> {
+  if (!url) return undefined;
+  if (/^data:/i.test(url)) return url;
+  if (/^blob:/i.test(url)) return undefined; // cannot dereference blob: across contexts
+  if (!/^https?:\/\//i.test(url)) return url;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return url;
+    const ct = res.headers.get("content-type") || "application/octet-stream";
+    const buf = Buffer.from(await res.arrayBuffer());
+    return `data:${ct};base64,${buf.toString("base64")}`;
+  } catch {
+    return url;
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const [{ default: chromium }, { default: puppeteer }] = await Promise.all([
@@ -65,11 +81,16 @@ export async function POST(req: Request) {
     });
     const page = await browser.newPage();
     // 在任何脚本运行之前，将简历数据写入 sessionStorage，避免超长 URL 及 431 错误
+    // 同时将远端头像资源内联为 data URL，避免因网络或拦截导致图片缺失
+    const preparedData = { ...resumeData } as any;
+    if (preparedData.avatar) {
+      preparedData.avatar = await toDataUrlIfRemote(preparedData.avatar);
+    }
     await page.evaluateOnNewDocument((data) => {
       try {
         window.sessionStorage.setItem("resumeData", JSON.stringify(data));
       } catch {}
-    }, resumeData);
+    }, preparedData);
     await page.emulateMediaType("print");
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
     // 等待关键容器渲染：优先等待 .resume-content；若未出现则退而求其次等待 .pdf-preview-mode

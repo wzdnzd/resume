@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,11 @@ export default function JobIntentionEditor({
 }: JobIntentionEditorProps) {
   const [enabled, setEnabled] = useState(jobIntentionSection?.enabled ?? true);
   const items = jobIntentionSection?.items || [];
+
+  // 同步外部 enabled 变化到本地状态，确保预览与编辑一致
+  useEffect(() => {
+    setEnabled(jobIntentionSection?.enabled ?? true);
+  }, [jobIntentionSection?.enabled]);
 
   /**
    * 处理拖拽排序结束事件

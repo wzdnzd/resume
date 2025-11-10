@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useLayoutEffect, useRef, useState } from "react"
 import { Icon } from "@iconify/react"
 import type { ResumeData } from "@/types/resume"
 import RichTextRenderer from "./rich-text-renderer"
@@ -14,6 +14,49 @@ interface ResumePreviewProps {
  */
 export default function ResumePreview({ resumeData }: ResumePreviewProps) {
   const isAsciiOnly = (str: string | undefined) => !!str && /^[\x00-\x7F]+$/.test(str);
+  const leftRef = useRef<HTMLDivElement | null>(null);
+  const rightRef = useRef<HTMLDivElement | null>(null);
+  const [rightBoxHeight, setRightBoxHeight] = useState<number | undefined>(undefined);
+
+  useLayoutEffect(() => {
+    if (!leftRef.current) return;
+    const el = leftRef.current;
+    const measure = () => {
+      const rect = el.getBoundingClientRect();
+      const h = Math.max(0, rect.height || (el as any).scrollHeight || 0);
+      setRightBoxHeight(h);
+    };
+    // 初次 + 多轮调度，确保收缩场景也能捕获（如列数减少、模块隐藏）
+    measure();
+    const raf = requestAnimationFrame(measure);
+    const t1 = setTimeout(measure, 0);
+    const t2 = setTimeout(measure, 60);
+    const RO = (window as any).ResizeObserver;
+    const ro = RO ? new RO(measure) : undefined;
+    if (ro) ro.observe(el);
+    const MO = (window as any).MutationObserver;
+    const mo = MO ? new MO(() => requestAnimationFrame(measure)) : undefined;
+    if (mo) mo.observe(el, { subtree: true, childList: true, characterData: true, attributes: true });
+    window.addEventListener('resize', measure);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      if (ro) ro.disconnect();
+      if (mo) mo.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [
+    resumeData.centerTitle,
+    resumeData.title,
+    resumeData.personalInfoSection?.layout?.mode,
+    resumeData.personalInfoSection?.layout?.itemsPerRow,
+    resumeData.personalInfoSection?.personalInfo?.length,
+    resumeData.jobIntentionSection?.enabled,
+    resumeData.jobIntentionSection?.items?.length,
+  ]);
+  // 等高策略：测量左侧真实高度，设置右侧容器高度；
+  // 父容器使用 items-start，避免 items-stretch 与右侧固定高度形成“锁高”导致头像不随左侧收缩。
   // 格式化求职意向显示
   const formatJobIntention = () => {
     if (!resumeData.jobIntentionSection?.enabled || !resumeData.jobIntentionSection?.items?.length) {
@@ -40,8 +83,19 @@ export default function ResumePreview({ resumeData }: ResumePreviewProps) {
   return (
     <div className="resume-preview resume-content">
       {/* 头部信息 */}
-      <div className={`flex items-start mb-6 ${resumeData.centerTitle ? 'flex-col items-center' : 'justify-between'}`}>
-        <div className={`flex-1 ${resumeData.centerTitle ? 'w-full' : ''}`}>
+      <div className={`flex mb-6 ${resumeData.centerTitle ? 'flex-col items-center' : 'justify-between items-start'}`}>
+        {/* 居中标题模式下，头像置于最上方并居中显示 */}
+        {resumeData.centerTitle && resumeData.avatar && (
+          <div className="mb-4">
+            <img
+              src={resumeData.avatar}
+              alt="头像"
+              className="resume-avatar w-20 h-20 rounded-full object-cover border-2 border-border box-border mx-auto"
+            />
+          </div>
+        )}
+
+        <div ref={leftRef} className={`flex-1 flex flex-col ${resumeData.centerTitle ? 'w-full' : ''}`}>
           <h1 className={`resume-title text-2xl font-bold text-foreground mb-4 ${resumeData.centerTitle ? 'text-center' : ''}`}>
             {resumeData.title || "简历标题"}
           </h1>
@@ -148,13 +202,13 @@ export default function ResumePreview({ resumeData }: ResumePreviewProps) {
           )}
         </div>
 
-        {/* 头像 */}
-        {resumeData.avatar && (
-          <div className={resumeData.centerTitle ? 'mt-4' : 'ml-6'}>
+        {/* 头像：左右布局时放在右侧，并在父容器高度内垂直居中 */}
+        {resumeData.avatar && !resumeData.centerTitle && (
+          <div ref={rightRef} className="ml-6 flex items-start" style={{ height: rightBoxHeight }}>
             <img
               src={resumeData.avatar}
               alt="头像"
-              className="resume-avatar w-20 h-20 rounded-full object-cover border-2 border-border"
+              className="resume-avatar h-full aspect-square rounded-full object-cover border-2 border-border box-border"
             />
           </div>
         )}
