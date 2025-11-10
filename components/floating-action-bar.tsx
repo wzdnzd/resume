@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface FloatingActionBarProps {
-  onAddRow: (columns: 1 | 2 | 3 | 4) => void
+  onAddRow: (columns: 1 | 2 | 3 | 4, afterRowId?: string) => void
   onDelete: () => void
 }
 

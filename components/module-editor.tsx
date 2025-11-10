@@ -222,9 +222,17 @@ function ModuleItem({
   /**
    * 添加新行
    */
-  const addRow = (columns: 1 | 2 | 3 | 4) => {
-    const newRow = createNewRow(columns, module.rows.length)
-    onUpdate({ rows: [...module.rows, newRow] })
+  const addRow = (columns: 1 | 2 | 3 | 4, afterRowId?: string) => {
+    const rows = [...module.rows]
+    const afterIndex = afterRowId ? rows.findIndex((r) => r.id === afterRowId) : -1
+    const insertIndex = afterIndex >= 0 ? afterIndex + 1 : rows.length
+    const newRow = createNewRow(columns, insertIndex)
+    rows.splice(insertIndex, 0, newRow)
+    // 重新计算 order，保证排序正确
+    rows.forEach((r, i) => {
+      r.order = i
+    })
+    onUpdate({ rows })
   }
 
   /**
@@ -394,14 +402,14 @@ interface ContentRowEditorProps {
   onUpdate: (updates: Partial<ModuleContentRow>) => void
   onRemove: () => void
   onUpdateElement: (elementId: string, updates: Partial<ModuleContentElement>) => void
-  onAddRow: (columns: 1 | 2 | 3 | 4) => void
+  onAddRow: (columns: 1 | 2 | 3 | 4, afterRowId?: string) => void
 }
 
 /**
  * 空行占位符组件
  */
 interface EmptyRowPlaceholderProps {
-  onAddRow: (columns: 1 | 2 | 3 | 4) => void
+  onAddRow: (columns: 1 | 2 | 3 | 4, afterRowId?: string) => void
 }
 
 function EmptyRowPlaceholder({ onAddRow }: EmptyRowPlaceholderProps) {
@@ -462,7 +470,10 @@ function ContentRowEditor({ row, onUpdate, onRemove, onUpdateElement, onAddRow }
           </div>
 
           {hoveredRow && (
-            <FloatingActionBar onAddRow={onAddRow} onDelete={() => setShowDeleteConfirm(true)} />
+            <FloatingActionBar
+              onAddRow={(columns) => onAddRow(columns, row.id)}
+              onDelete={() => setShowDeleteConfirm(true)}
+            />
           )}
         </div>
       </div>
