@@ -19,6 +19,7 @@ import type { ResumeModule, ModuleContentRow, ModuleContentElement } from "@/typ
 import IconPicker from "./icon-picker"
 import FloatingActionBar from "./floating-action-bar"
 import RichTextInput from "./rich-text-input"
+import TagInput from "./tag-input"
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd"
 
 interface ModuleEditorProps {
@@ -65,8 +66,23 @@ const createNewRow = (columns: 1 | 2 | 3 | 4, order: number): ModuleContentRow =
 
   return {
     id: generateId(),
+    type: 'rich',
     columns,
     elements,
+    order,
+  }
+}
+
+/**
+ * 创建标签行
+ */
+const createNewTagsRow = (order: number): ModuleContentRow => {
+  return {
+    id: generateId(),
+    type: 'tags',
+    columns: 1,
+    elements: [],
+    tags: [],
     order,
   }
 }
@@ -236,6 +252,19 @@ function ModuleItem({
   }
 
   /**
+   * 添加标签行
+   */
+  const addTagsRow = (afterRowId?: string) => {
+    const rows = [...module.rows]
+    const afterIndex = afterRowId ? rows.findIndex((r) => r.id === afterRowId) : -1
+    const insertIndex = afterIndex >= 0 ? afterIndex + 1 : rows.length
+    const newRow = createNewTagsRow(insertIndex)
+    rows.splice(insertIndex, 0, newRow)
+    rows.forEach((r, i) => { r.order = i })
+    onUpdate({ rows })
+  }
+
+  /**
    * 更新行
    */
   const updateRow = (rowId: string, updates: Partial<ModuleContentRow>) => {
@@ -356,11 +385,12 @@ function ModuleItem({
                     onRemove={() => removeRow(row.id)}
                     onUpdateElement={(elementId, updates) => updateElement(row.id, elementId, updates)}
                     onAddRow={addRow}
+                    onAddTagsRow={() => addTagsRow(row.id)}
                   />
                 ))}
 
               {module.rows.length === 0 && (
-                <EmptyRowPlaceholder onAddRow={addRow} />
+                <EmptyRowPlaceholder onAddRow={addRow} onAddTagsRow={() => addTagsRow()} />
               )}
             </div>
           </div>
@@ -403,6 +433,7 @@ interface ContentRowEditorProps {
   onRemove: () => void
   onUpdateElement: (elementId: string, updates: Partial<ModuleContentElement>) => void
   onAddRow: (columns: 1 | 2 | 3 | 4, afterRowId?: string) => void
+  onAddTagsRow?: () => void
 }
 
 /**
@@ -410,9 +441,10 @@ interface ContentRowEditorProps {
  */
 interface EmptyRowPlaceholderProps {
   onAddRow: (columns: 1 | 2 | 3 | 4, afterRowId?: string) => void
+  onAddTagsRow?: () => void
 }
 
-function EmptyRowPlaceholder({ onAddRow }: EmptyRowPlaceholderProps) {
+function EmptyRowPlaceholder({ onAddRow, onAddTagsRow }: EmptyRowPlaceholderProps) {
   const [hoveredEmpty, setHoveredEmpty] = useState(false)
 
   return (
@@ -425,14 +457,14 @@ function EmptyRowPlaceholder({ onAddRow }: EmptyRowPlaceholderProps) {
         <p className="text-sm">暂无内容，悬浮到此处添加行</p>
 
         {hoveredEmpty && (
-          <FloatingActionBar onAddRow={onAddRow} onDelete={() => { }} />
+          <FloatingActionBar onAddRow={onAddRow} onAddTagsRow={onAddTagsRow} onDelete={() => { }} />
         )}
       </div>
     </div>
   )
 }
 
-function ContentRowEditor({ row, onUpdate, onRemove, onUpdateElement, onAddRow }: ContentRowEditorProps) {
+function ContentRowEditor({ row, onUpdate, onRemove, onUpdateElement, onAddRow, onAddTagsRow }: ContentRowEditorProps) {
   const [hoveredRow, setHoveredRow] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
@@ -449,29 +481,41 @@ function ContentRowEditor({ row, onUpdate, onRemove, onUpdateElement, onAddRow }
         onMouseLeave={() => setHoveredRow(false)}
       >
         <div className="border rounded-lg bg-white relative">
-          <div
-            className="grid"
-            style={{
-              gridTemplateColumns: `repeat(${row.columns}, 1fr)`,
-            }}
-          >
-            {row.elements.map((element, index) => (
-              <div
-                key={element.id}
-                className={index < row.elements.length - 1 ? "border-r" : ""}
-              >
-                <RichTextInput
-                  element={element}
-                  onChange={(updates) => onUpdateElement(element.id, updates)}
-                  placeholder="输入内容..."
-                />
-              </div>
-            ))}
-          </div>
+          {row.type === 'tags' ? (
+            <div className="p-2">
+              <TagInput
+                value={row.tags || []}
+                onChange={(tags) => onUpdate({ tags })}
+                maxTags={12}
+                placeholder="输入标签后回车添加"
+              />
+            </div>
+          ) : (
+            <div
+              className="grid"
+              style={{
+                gridTemplateColumns: `repeat(${row.columns}, 1fr)`,
+              }}
+            >
+              {row.elements.map((element, index) => (
+                <div
+                  key={element.id}
+                  className={index < row.elements.length - 1 ? "border-r" : ""}
+                >
+                  <RichTextInput
+                    element={element}
+                    onChange={(updates) => onUpdateElement(element.id, updates)}
+                    placeholder="输入内容..."
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           {hoveredRow && (
             <FloatingActionBar
               onAddRow={(columns) => onAddRow(columns, row.id)}
+              onAddTagsRow={onAddTagsRow}
               onDelete={() => setShowDeleteConfirm(true)}
             />
           )}

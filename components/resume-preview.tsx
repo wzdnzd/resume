@@ -237,22 +237,32 @@ export default function ResumePreview({ resumeData }: ResumePreviewProps) {
                 {module.rows
                   .sort((a, b) => a.order - b.order)
                   .map((row) => (
-                    <div
-                      key={row.id}
-                      className="grid gap-3 items-center"
-                      style={{
-                        gridTemplateColumns: `repeat(${row.columns}, 1fr)`,
-                      }}
-                    >
-                      {row.elements.map((element) => (
-                        <div
-                          key={element.id}
-                          className="text-sm text-foreground"
-                        >
-                          <RichTextRenderer content={element.content} />
-                        </div>
-                      ))}
-                    </div>
+                    row.type === 'tags' ? (
+                      <div key={row.id} className="flex flex-wrap gap-1 items-center">
+                        {(row.tags || []).slice(0, 12).map((tag, idx) => (
+                          <span key={`${row.id}-tag-${idx}`} className="inline-flex items-center border border-gray-300 rounded-full px-2 py-0.5 text-xs text-gray-600">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <div
+                        key={row.id}
+                        className="grid gap-3 items-center"
+                        style={{
+                          gridTemplateColumns: `repeat(${row.columns}, 1fr)`,
+                        }}
+                      >
+                        {row.elements.map((element) => (
+                          <div
+                            key={element.id}
+                            className="text-sm text-foreground"
+                          >
+                            <RichTextRenderer content={element.content} />
+                          </div>
+                        ))}
+                      </div>
+                    )
                   ))}
               </div>
             </div>

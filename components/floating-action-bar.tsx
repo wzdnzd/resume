@@ -4,10 +4,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 interface FloatingActionBarProps {
   onAddRow: (columns: 1 | 2 | 3 | 4, afterRowId?: string) => void
+  onAddTagsRow?: () => void
   onDelete: () => void
 }
 
-export default function FloatingActionBar({ onAddRow, onDelete }: FloatingActionBarProps) {
+export default function FloatingActionBar({ onAddRow, onAddTagsRow, onDelete }: FloatingActionBarProps) {
   return (
     <TooltipProvider>
       <div className="absolute top-full right-0 flex items-center gap-0 rounded shadow-md overflow-hidden z-10">
@@ -100,6 +101,29 @@ export default function FloatingActionBar({ onAddRow, onDelete }: FloatingAction
           </TooltipTrigger>
           <TooltipContent>
             <p>添加一行四等分</p>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* 添加标签行 */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="sm"
+              className="h-5 px-1 rounded-none bg-teal-500 hover:bg-teal-600 text-white border-r border-black/20"
+              onClick={() => onAddTagsRow && onAddTagsRow()}
+            >
+              <span className="flex items-center justify-center gap-0.5">
+                <svg className="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                  <path fill="currentColor" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM200 344V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H248v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"></path>
+                </svg>
+                <svg className="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                  <path fill="currentColor" d="M433.2 103.1L581.4 253.4C609.1 281.5 609.1 326.5 581.4 354.6L425 512.9C415.7 522.3 400.5 522.4 391.1 513.1C381.7 503.8 381.6 488.6 390.9 479.2L547.3 320.8C556.5 311.5 556.5 296.4 547.3 287.1L399 136.9C389.7 127.5 389.8 112.3 399.2 103C408.6 93.7 423.8 93.8 433.1 103.2zM64.1 293.5L64.1 160C64.1 124.7 92.8 96 128.1 96L261.6 96C278.6 96 294.9 102.7 306.9 114.7L450.9 258.7C475.9 283.7 475.9 324.2 450.9 349.2L317.4 482.7C292.4 507.7 251.9 507.7 226.9 482.7L82.9 338.7C70.9 326.7 64.2 310.4 64.2 293.4zM208.1 208C208.1 190.3 193.8 176 176.1 176C158.4 176 144.1 190.3 144.1 208C144.1 225.7 158.4 240 176.1 240C193.8 240 208.1 225.7 208.1 208z" />
+                </svg>
+              </span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>添加标签行</p>
           </TooltipContent>
         </Tooltip>
 

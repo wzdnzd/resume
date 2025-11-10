@@ -107,10 +107,14 @@ export interface ModuleContentElement {
 export interface ModuleContentRow {
   /** 唯一标识符 */
   id: string
+  /** 行类型：富文本行 或 标签行 */
+  type?: 'rich' | 'tags'
   /** 该行的列数（1-4） */
   columns: 1 | 2 | 3 | 4
   /** 该行包含的元素（数组长度 = columns） */
   elements: ModuleContentElement[]
+  /** 标签行的标签内容（当 type === 'tags' 时使用） */
+  tags?: string[]
   /** 行顺序 */
   order: number
 }
