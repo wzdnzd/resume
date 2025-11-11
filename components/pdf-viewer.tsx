@@ -94,15 +94,38 @@ export function PDFViewer({
         onModeChange?.("fallback");
         return;
       }
+      // 优先尝试服务器模式（若未强制打印）。
+      // 为避免频繁探测，使用带 TTL 的缓存；TTL 过期后重新探测。
       let available = FORCE_SERVER;
       if (!available) {
-        // 使用 sessionStorage 缓存探测结果，减少健康检查次数
-        const cached = sessionStorage.getItem("serverPdfAvailable");
-        if (cached !== null) {
-          available = cached === "1";
-        } else {
+        try {
+          const KEY = "serverPdfAvailable:v1";
+          const raw = sessionStorage.getItem(KEY);
+          const now = Date.now();
+          const ttlMs = 30 * 1000; // 30 秒
+          let cachedOk: boolean | null = null;
+          if (raw) {
+            try {
+              const rec = JSON.parse(raw) as { value: boolean; expires: number };
+              if (rec && typeof rec.expires === 'number' && rec.expires > now) {
+                cachedOk = !!rec.value;
+              } else {
+                sessionStorage.removeItem(KEY);
+              }
+            } catch {
+              sessionStorage.removeItem(KEY);
+            }
+          }
+          if (cachedOk === null) {
+            const ok = await checkServerPdfAvailable();
+            sessionStorage.setItem(KEY, JSON.stringify({ value: ok, expires: now + ttlMs }));
+            available = ok;
+          } else {
+            available = cachedOk;
+          }
+        } catch {
+          // 如果缓存出错，直接探测一次
           available = await checkServerPdfAvailable();
-          sessionStorage.setItem("serverPdfAvailable", available ? "1" : "0");
         }
       }
 

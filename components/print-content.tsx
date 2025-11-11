@@ -1,19 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { ResumeData } from "@/types/resume";
 import ResumePreview from "@/components/resume-preview";
 
 export default function PrintContent({ initialData }: { initialData?: ResumeData | null }) {
-  const [resumeData] = useState<ResumeData | null>(() => {
-    if (initialData) return initialData;
+  // Avoid accessing sessionStorage during SSR. Hydrate from initialData, then
+  // read sessionStorage after mount so Puppeteer-injected data is picked up.
+  const [resumeData, setResumeData] = useState<ResumeData | null>(initialData ?? null);
+  useEffect(() => {
+    if (resumeData) return; // already have data from URL param
     try {
-      const s = typeof window !== "undefined" ? sessionStorage.getItem("resumeData") : null;
-      return s ? (JSON.parse(s) as ResumeData) : null;
-    } catch {
-      return null;
-    }
-  });
+      const s = sessionStorage.getItem("resumeData");
+      if (s) {
+        setResumeData(JSON.parse(s) as ResumeData);
+      }
+    } catch {}
+  }, [resumeData]);
 
   return (
     <div className="pdf-preview-mode">
