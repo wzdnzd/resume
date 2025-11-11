@@ -489,7 +489,7 @@ function ContentRowEditor({ row, onUpdate, onRemove, onUpdateElement, onAddRow, 
               <TagInput
                 value={row.tags || []}
                 onChange={(tags) => onUpdate({ tags })}
-                maxTags={12}
+                maxTags={20}
                 placeholder="输入标签后回车添加"
               />
             </div>

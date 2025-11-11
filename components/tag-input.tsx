@@ -10,7 +10,7 @@ interface TagInputProps {
   maxTags?: number
 }
 
-export default function TagInput({ value, onChange, placeholder = "输入标签后回车添加", maxTags = 12 }: TagInputProps) {
+export default function TagInput({ value, onChange, placeholder = "输入标签后回车添加", maxTags = 20 }: TagInputProps) {
   const [input, setInput] = useState("")
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)

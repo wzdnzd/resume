@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react";
 import type { ResumeData } from "@/types/resume";
-import { generatePdfFilename, generatePdfPathFilename } from "@/lib/resume-utils";
+import { generatePdfFilename } from "@/lib/resume-utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -132,7 +132,7 @@ export function ExportButton({
   };
 
   const exportAsPDF = () => {
-    const filename = generatePdfPathFilename(resumeData.title || "");
+    const filename = generatePdfFilename(resumeData.title || "");
     const childWindow = window.open(`/pdf/preview/${filename}`, '_blank');
     if (!childWindow) {
       console.error('Failed to open popup window');

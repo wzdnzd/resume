@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ResumeData } from "@/types/resume";
-import { generatePdfPathFilename } from "@/lib/resume-utils";
+import { generatePdfFilename } from "@/lib/resume-utils";
 import ResumePreview from "./resume-preview";
 
 
@@ -32,7 +32,7 @@ async function checkServerPdfAvailable(): Promise<boolean> {
 }
 
 async function generateServerPdf(resumeData: ResumeData): Promise<Blob> {
-  const filename = generatePdfPathFilename(resumeData.title || "");
+  const filename = generatePdfFilename(resumeData.title || "");
   const res = await fetch(`/api/pdf/${filename}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -123,7 +123,7 @@ export function PDFViewer({
             const form = document.createElement("form");
             form.method = "POST";
             const parsed: ResumeData = JSON.parse(resumeKey);
-            const targetName = serverFilename || generatePdfPathFilename(parsed.title || "");
+            const targetName = serverFilename || generatePdfFilename(parsed.title || "");
             form.action = `/api/pdf/${targetName}`;
             form.style.display = "none";
             const textarea = document.createElement("textarea");
