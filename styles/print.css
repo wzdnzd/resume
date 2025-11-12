@@ -176,7 +176,7 @@
     padding-left: 15pt !important;
   }
 
-  li {
+  li:not(:last-child) {
     margin-bottom: 5pt !important;
     font-size: 10pt !important;
     line-height: 1.6 !important;
@@ -187,17 +187,27 @@
     margin: 0 0 5pt 0 !important;
     line-height: 1.6 !important;
   }
-  /* 在模块行内：将段后间距减少一半，另一半转移到下一行的段前 */
+  /* 顶层列表块：为列表整体增加段后间距，避免与下一段合并贴紧 */
+  .resume-content .ProseMirror > ul,
+  .resume-content .ProseMirror > ol {
+    margin: 0 0 5pt 0 !important;
+  }
+  /* 当段落紧跟在列表后：补充段前距离，避免贴靠 */
+  .resume-content .ProseMirror > ol + p,
+  .resume-content .ProseMirror > ul + p {
+    margin-top: 5pt !important;
+  }
+  /* 模块行：为实现格内垂直居中，去掉格内段后，由行间距统一控制 */
   .resume-content .resume-module .grid > div .ProseMirror > p:last-child {
-    margin-bottom: 2.5pt !important; /* 原 5pt 的一半 */
+    margin-bottom: 0 !important;
   }
-  .resume-content .resume-module .grid > div .ProseMirror > ul:last-child > li:last-child,
-  .resume-content .resume-module .grid > div .ProseMirror > ol:last-child > li:last-child {
-    margin-bottom: 2.5pt !important; /* 列表最后一项同样减半 */
+  .resume-content .resume-module .grid > div .ProseMirror > ul:last-child,
+  .resume-content .resume-module .grid > div .ProseMirror > ol:last-child {
+    margin-bottom: 0 !important;
   }
-  /* 段前：仅在有前一行时增加（避免首行顶部留白） */
+  /* 行间距统一设为 5pt，等同于顶层段落的段后 */
   .resume-content .resume-module .grid + .grid {
-    margin-top: 2.5pt !important;
+    margin-top: 5pt !important;
   }
   /* 打印：让单行内容在最小高度内垂直居中 */
   .resume-content .resume-module .grid > div .ProseMirror {
@@ -277,6 +287,11 @@
   margin: 0 0 0.6em 0 !important;
   line-height: 1.6 !important;
 }
+/* 预览：顶层列表块的段后间距 */
+.resume-preview.resume-content .ProseMirror > ul,
+.resume-preview.resume-content .ProseMirror > ol {
+  margin: 0 0 0.6em 0 !important;
+}
 /* 预览：单行网格行内让文本在 40px 的编辑器最小高度中垂直居中 */
 .resume-preview.resume-content .resume-module .grid > div .ProseMirror {
   display: flex;
@@ -284,16 +299,16 @@
   justify-content: center;
 }
 .resume-preview.resume-content .resume-module .grid > div .ProseMirror > p:last-child {
-  margin-bottom: 0.3em !important; /* 原 0.6em 的一半 */
+  margin-bottom: 0 !important; /* 单行格内，为了垂直居中去掉内边距 */
 }
-.resume-preview.resume-content .resume-module .grid > div .ProseMirror > ul:last-child > li:last-child,
-.resume-preview.resume-content .resume-module .grid > div .ProseMirror > ol:last-child > li:last-child {
-  margin-bottom: 0.3em !important; /* 列表最后一项同样减半 */
+.resume-preview.resume-content .resume-module .grid > div .ProseMirror > ul:last-child,
+.resume-preview.resume-content .resume-module .grid > div .ProseMirror > ol:last-child {
+  margin-bottom: 0 !important; /* 列表亦不在格内留下段后 */
 }
 .resume-preview.resume-content .resume-module .grid + .grid {
-  margin-top: 0.3em !important; /* 半数转移为段前 */
+  margin-top: 0.6em !important; /* 全部由行间距统一控制 */
 }
-.resume-preview.resume-content li {
+.resume-preview.resume-content li:not(:last-child) {
   margin-bottom: 0.6em !important;
   line-height: 1.6 !important;
 }
@@ -360,10 +375,14 @@
       color: #000;
       white-space: pre-wrap;
     }
-    /* 预览下：顶层段落与列表项的间距/行高 */
+    /* 预览下：顶层段落与列表的间距/行高 */
     .resume-content .ProseMirror > p {
       margin: 0 0 0.6em 0 !important;
       line-height: 1.6 !important;
+    }
+    .resume-content .ProseMirror > ul,
+    .resume-content .ProseMirror > ol {
+      margin: 0 0 0.6em 0 !important;
     }
     /* PDF 预览：在单行 40px 的最小高度中垂直居中 */
     .resume-content .resume-module .grid > div .ProseMirror {
@@ -373,16 +392,16 @@
     }
     /* 模块行：段后减半，段前补半 */
     .resume-content .resume-module .grid > div .ProseMirror > p:last-child {
-      margin-bottom: 0.3em !important;
+      margin-bottom: 0 !important; /* PDF 预览下同理，去掉格内段后 */
     }
-    .resume-content .resume-module .grid > div .ProseMirror > ul:last-child > li:last-child,
-    .resume-content .resume-module .grid > div .ProseMirror > ol:last-child > li:last-child {
-      margin-bottom: 0.3em !important;
+    .resume-content .resume-module .grid > div .ProseMirror > ul:last-child,
+    .resume-content .resume-module .grid > div .ProseMirror > ol:last-child {
+      margin-bottom: 0 !important;
     }
     .resume-content .resume-module .grid + .grid {
-      margin-top: 0.3em !important;
+      margin-top: 0.6em !important; /* 与顶层段后一致 */
     }
-    .resume-content .ProseMirror li {
+    .resume-content .ProseMirror li:not(:last-child) {
       margin-bottom: 0.6em !important;
       line-height: 1.6 !important;
     }

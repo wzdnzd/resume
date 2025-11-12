@@ -242,7 +242,14 @@
     line-height: 1.6 !important;
   }
 
-  .resume-content .ProseMirror li {
+  /* 顶层列表块：给予外边距，参与与段落的上下间距计算 */
+  .resume-content .ProseMirror>ul,
+  .resume-content .ProseMirror>ol {
+    margin: 0 0 5pt 0 !important;
+  }
+
+  /* 列表项：仅为非最后一项设置项内间距，避免与列表块 margin 叠加导致段后过大 */
+  .resume-content .ProseMirror li:not(:last-child) {
     margin-bottom: 5pt !important;
     line-height: 1.6 !important;
   }
@@ -289,7 +296,37 @@
     line-height: 1.6 !important;
   }
 
-  .resume-preview.resume-content li {
+  /* 预览：单元格（grid 的每个列）内让 ProseMirror 内容垂直居中 */
+  .resume-preview.resume-content .resume-module .grid>div .ProseMirror {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* 预览：格内最后一个块不再留下段后，避免下间距更大导致看起来偏上 */
+  .resume-preview.resume-content .resume-module .grid>div .ProseMirror>p:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  .resume-preview.resume-content .resume-module .grid>div .ProseMirror>ul:last-child,
+  .resume-preview.resume-content .resume-module .grid>div .ProseMirror>ol:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  /* 预览：顶层列表块的段后间距 */
+  .resume-preview.resume-content .ProseMirror>ul,
+  .resume-preview.resume-content .ProseMirror>ol {
+    margin: 0 0 0.6em 0 !important;
+  }
+
+  /* 预览：当段落紧跟在列表之后时，补充对称的段前距离 */
+  .resume-preview.resume-content .ProseMirror>ol+p,
+  .resume-preview.resume-content .ProseMirror>ul+p {
+    margin-top: 0.6em !important;
+  }
+
+  /* 预览：列表项（非最后一个）内部间距 */
+  .resume-preview.resume-content li:not(:last-child) {
     margin-bottom: 0.6em !important;
     line-height: 1.6 !important;
   }
@@ -346,7 +383,17 @@
     line-height: 1.6 !important;
   }
 
-  .pdf-preview-mode .resume-content .ProseMirror li {
+  .pdf-preview-mode .resume-content .ProseMirror>ul,
+  .pdf-preview-mode .resume-content .ProseMirror>ol {
+    margin: 0 0 0.6em 0 !important;
+  }
+
+  .pdf-preview-mode .resume-content .ProseMirror>ol+p,
+  .pdf-preview-mode .resume-content .ProseMirror>ul+p {
+    margin-top: 0.6em !important;
+  }
+
+  .pdf-preview-mode .resume-content .ProseMirror li:not(:last-child) {
     margin-bottom: 0.6em !important;
     line-height: 1.6 !important;
   }
@@ -354,5 +401,39 @@
   .space-y-\[0\.3em\]> :where(:not([hidden]) ~ :not([hidden])) {
     margin-block-start: 0.3em !important;
     margin-top: 0.3em !important;
+  }
+
+  /* 编辑器（左侧 RichTextInput）内的段落/列表垂直节距：
+     仅在根级段落与列表之间增加对称的段后间距，避免“p 无上边距”
+     导致与前一有序列表贴得过紧的问题；不影响嵌套列表。 */
+  .rt-editor.ProseMirror>p {
+    margin: 0 0 0.6em 0 !important;
+  }
+
+  .rt-editor.ProseMirror>ul,
+  .rt-editor.ProseMirror>ol {
+    margin: 0 0 0.6em 0 !important;
+  }
+
+  .rt-editor.ProseMirror>ol+p,
+  .rt-editor.ProseMirror>ul+p {
+    margin-top: 0.6em !important;
+  }
+
+  .rt-editor.ProseMirror>p:last-child,
+  .rt-editor.ProseMirror>ul:last-child,
+  .rt-editor.ProseMirror>ol:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  /* Ensure row spacing in resume preview consistently uses 0.6em
+     even when Tailwind's `space-y-[0.3em]` utility is present.
+     Some production builds (e.g. Vercel) may end up applying the
+     utility after our print styles due to layer ordering, which
+     results in smaller gaps. This rule lives after the utility
+     override above so it wins in the cascade. */
+  .resume-preview.resume-content .resume-module .grid+.grid,
+  .pdf-preview-mode .resume-content .resume-module .grid+.grid {
+    margin-top: 0.6em !important;
   }
 }

@@ -132,7 +132,7 @@ export default function RichTextInput({
     content: element.content || getDefaultContent(),
     editorProps: {
       attributes: {
-        class: `min-h-[40px] px-3 py-2 focus:outline-none ${showBorder ? 'border border-dashed border-teal-200 focus-within:border-teal-300' : ''
+        class: `rt-editor min-h-[40px] px-3 py-2 focus:outline-none ${showBorder ? 'border border-dashed border-teal-200 focus-within:border-teal-300' : ''
           }`,
       },
     },
