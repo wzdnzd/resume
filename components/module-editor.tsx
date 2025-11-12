@@ -394,8 +394,7 @@ function ModuleItem({
               )}
             </div>
 
-            {/* 底部添加行 */}
-            <EmptyRowPlaceholder onAddRow={addRow} onAddTagsRow={() => addTagsRow()} />
+            {/* 已有行时通过悬浮最后一行添加，不再显示底部占位 */}
           </div>
         )}
       </div>
