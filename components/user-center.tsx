@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast"
 import type { StoredResume } from "@/types/resume"
 import { importFromMagicyanFile } from "@/lib/utils"
 import { StorageError, createEntryFromData, deleteResumes, getAllResumes, loadDefaultTemplate, loadExampleTemplate } from "@/lib/storage"
+import { createDefaultResumeData } from "@/lib/utils"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import ExportButton from "@/components/export-button"
 
@@ -107,9 +108,21 @@ export default function UserCenter() {
     else setSelected(new Set())
   }
 
+  // 将初始化数据预加载并写入 sessionStorage，然后再跳转，避免在新页面内数据“闪变”
+  const prefetchAndOpenNew = async (type: "default" | "example") => {
+    try {
+      const tpl = type === "example" ? await loadExampleTemplate() : await loadDefaultTemplate()
+      const data = tpl ?? createDefaultResumeData()
+      if (typeof window !== "undefined") {
+        try { sessionStorage.setItem("new-edit-initial-data", JSON.stringify(data)) } catch { }
+      }
+    } finally {
+      router.push(`/edit/new`)
+    }
+  }
+
   const handleCreate = () => {
-    // 不立即保存，进入新建编辑页，由用户点击保存时再写入本地存储
-    router.push(`/edit/new`)
+    void prefetchAndOpenNew("default")
   }
 
   const handleClone = (id: string) => {
@@ -243,7 +256,7 @@ export default function UserCenter() {
                 <Button
                   variant="outline"
                   className="gap-2"
-                  onClick={() => router.push(`/edit/new?example=1`)}
+                  onClick={() => prefetchAndOpenNew("example")}
                 >
                   <Icon icon="mdi:lightbulb-on" className="w-4 h-4" /> 示例
                 </Button>

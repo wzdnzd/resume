@@ -24,6 +24,20 @@ function NewEditPageContent() {
   const cloneId = search.get("clone")
   const useExample = search.get("example") === "1" || search.get("example") === "true"
 
+  // 从 sessionStorage 恢复用户中心预加载的数据
+  const prefetchedData: ResumeData | undefined = useMemo(() => {
+    if (typeof window === "undefined") return undefined
+    try {
+      const raw = sessionStorage.getItem("new-edit-initial-data")
+      if (!raw) return undefined
+      const parsed = JSON.parse(raw) as ResumeData
+      sessionStorage.removeItem("new-edit-initial-data")
+      return parsed
+    } catch {
+      return undefined
+    }
+  }, [])
+
   // 同步派生克隆数据；在 SSR 阶段返回 undefined，客户端首帧即可拿到
   const clonedData: ResumeData | undefined = useMemo(() => {
     if (!cloneId) return undefined
@@ -54,8 +68,8 @@ function NewEditPageContent() {
   return (
     <main className="min-h-screen bg-background">
       <ResumeBuilder
-        // 如果是克隆则直接使用克隆数据；否则让构建器自己加载模板并即时显示默认表单
-        initialData={clonedData}
+        // 优先使用：克隆数据 > 预加载数据
+        initialData={clonedData ?? prefetchedData}
         template={useExample ? "example" : "default"}
         onBack={() => router.push("/")}
         onSave={(d) => handleSave(d)}
